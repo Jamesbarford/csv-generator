@@ -23,8 +23,19 @@
 #define DATE "date"
 #define STRING "string"
 
+enum DATA_TYPE
+{
+    Number,
+    String,
+    Date
+};
+
 static const char *REQUIRED_ARGS[3] = {HEADERS, DATA_TYPES, ROW_COUNT};
-static const std::set<std::string> VALID_TYPES = {"date", "number", "string"};
+static const std::set<std::string> VALID_TYPES = {DATE, NUMBER, STRING};
+static const std::map<std::string, DATA_TYPE> VALID_TYPE_MAP = {
+    {NUMBER, DATA_TYPE::Number},
+    {STRING, DATA_TYPE::String},
+    {DATE, DATA_TYPE::Date}};
 
 typedef std::map<std::string, std::vector<std::string>> CommandMap;
 
@@ -92,35 +103,31 @@ void write_csv(std::string *file_name, std::vector<std::string> *headers, std::v
     std::ofstream csv_file;
     csv_file.open(*file_name);
     size_t column_count = headers->size();
-    size_t k = 0;
-    size_t j = 0;
 
     for (size_t i = 0; i < column_count; ++i)
-        if (i == column_count - 1)
-            csv_file << headers->at(i) << '\n';
-        else
-            csv_file << headers->at(i) << ",";
+        csv_file << headers->at(i) << ((i == column_count - 1) ? '\n' : ',');
 
-    while ((++j) <= row_count)
-    {
-        k = 0;
-        while (k < column_count)
+    for (size_t j = row_count; j > 0; --j)
+        for (size_t k = 0; k < column_count; ++k)
         {
-            std::string data_type = data_types->at(k);
-            if (data_type == DATE)
-                csv_file << get_random_date(DATE_START, DATE_END);
-            else if (data_type == STRING)
-                csv_file << get_uuid();
-            else
-                csv_file << j;
+            switch (VALID_TYPE_MAP.at(data_types->at(k)))
+            {
+            case DATA_TYPE::Number:
+                csv_file << (row_count - j) + 1;
+                break;
 
-            if (k == (column_count - 1))
-                csv_file << '\n';
-            else
-                csv_file << ',';
-            ++k;
+            case DATA_TYPE::String:
+                csv_file << get_uuid();
+                break;
+
+            case DATA_TYPE::Date:
+                csv_file << get_random_date(DATE_START, DATE_END);
+
+            default:
+                break;
+            }
+            csv_file << ((k == (column_count - 1)) ? '\n' : ',');
         }
-    }
 
     csv_file.close();
 }
