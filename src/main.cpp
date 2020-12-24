@@ -122,6 +122,7 @@ void write_csv(std::string *file_name, std::vector<std::string> *headers, std::v
 
             case DATA_TYPE::Date:
                 csv_file << get_random_date(DATE_START, DATE_END);
+                break;
 
             default:
                 break;
