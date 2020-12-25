@@ -11,7 +11,7 @@ all: $(LINK_TARGET)
 	@echo "compilation success ✅"
 
 $(LINK_TARGET): $(OBJS)
-	$(CC) $(CC_FLAGS) -o $@ $^
+	$(CC) $(CC_FLAGS) -o $@ $^ -luuid
 
 $(OUT_DIR)/%.o: $(SRC)/%.cpp
 	$(CC) $(CC_FLAGS) -o $@ -c $<
